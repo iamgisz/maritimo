@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tratamento Aduaneiro do E-Commerce Internacional — UniSantos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@200;300;400;600;700;900&family=DM+Sans:ital,wght@0,200;0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f6f8;
+    --bg2: #ffffff;
+    --surface: rgba(0,0,0,0.03);
+    --surface2: rgba(0,0,0,0.055);
+    --border: rgba(0,0,0,0.08);
+    --border2: rgba(0,0,0,0.14);
+    --text: #0f0f14;
+    --muted: rgba(15,15,20,0.48);
+    --accent: #2563eb;
+    --accent2: #7c3aed;
+    --accent3: #059669;
+    --nav-bg: rgba(246,246,248,0.85);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; cursor: none; }
+
+  /* CURSOR */
+  #cursor { position: fixed; top: 0; left: 0; z-index: 9999; pointer-events: none; }
+  #cursor-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); position: absolute; transform: translate(-50%,-50%); }
+  #cursor-ring { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid rgba(37,99,235,0.45); position: absolute; transform: translate(-50%,-50%); transition: all 0.18s ease; }
+
+  /* NAV */
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 18px 52px; display: flex; align-items: center; justify-content: space-between; background: var(--nav-bg); backdrop-filter: blur(24px); border-bottom: 1px solid var(--border); transition: all 0.4s; }
+  .nav-logo { font-family: 'Unbounded', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.14em; color: var(--text); }
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 400; letter-spacing: 0.02em; transition: color 0.25s; }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta { background: var(--accent); color: #fff; text-decoration: none; padding: 10px 22px; border-radius: 8px; font-size: 13px; font-weight: 500; transition: opacity 0.3s, transform 0.3s; }
+  .nav-cta:hover { opacity: 0.88; transform: translateY(-1px); }
+  .nav-burger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+  .nav-burger span { display: block; width: 24px; height: 1.5px; background: var(--text); transition: all 0.3s; }
+
+  /* MOBILE MENU */
+  .mobile-menu { display: none; position: fixed; inset: 0; z-index: 99; background: rgba(246,246,248,0.98); backdrop-filter: blur(20px); flex-direction: column; align-items: center; justify-content: center; gap: 32px; }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a { font-family: 'Unbounded', sans-serif; font-size: 20px; color: var(--text); text-decoration: none; }
+
+  /* HERO */
+  #hero { min-height: 100vh; display: flex; align-items: center; position: relative; overflow: hidden; padding: 130px 52px 100px; }
+  .hero-bg { position: absolute; inset: 0; z-index: 0; background: radial-gradient(ellipse 70% 60% at 70% 35%, rgba(37,99,235,0.07) 0%, transparent 65%), radial-gradient(ellipse 50% 50% at 15% 75%, rgba(124,58,237,0.05) 0%, transparent 60%); }
+  .hero-grid { position: absolute; inset: 0; z-index: 0; background-image: linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px); background-size: 64px 64px; mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, black 20%, transparent 100%); }
+  .hero-orbs { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+  .orb { position: absolute; border-radius: 50%; filter: blur(90px); animation: float 9s ease-in-out infinite; }
+  .orb1 { width: 520px; height: 520px; background: rgba(37,99,235,0.09); top: -120px; right: 3%; }
+  .orb2 { width: 360px; height: 360px; background: rgba(124,58,237,0.07); bottom: 5%; left: 18%; animation-delay: -3s; }
+  .orb3 { width: 240px; height: 240px; background: rgba(5,150,105,0.05); top: 28%; left: -70px; animation-delay: -6s; }
+  @keyframes float { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-28px) scale(1.04); } }
+
+  .hero-inner { position: relative; z-index: 1; max-width: 880px; }
+  .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--border2); border-radius: 100px; padding: 8px 18px; margin-bottom: 40px; font-size: 12px; letter-spacing: 0.07em; color: var(--muted); box-shadow: 0 2px 12px rgba(0,0,0,0.06); opacity: 0; transform: translateY(20px); animation: fadeUp 0.8s 0.2s forwards; }
+  .hero-badge-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent3); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .hero-title { font-family: 'Unbounded', sans-serif; font-size: clamp(32px, 5vw, 74px); font-weight: 700; line-height: 1.09; letter-spacing: -0.025em; color: var(--text); margin-bottom: 28px; opacity: 0; transform: translateY(30px); animation: fadeUp 0.9s 0.4s forwards; }
+  .hero-title .grad { background: linear-gradient(135deg, var(--accent) 10%, var(--accent2) 80%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero-sub { font-size: clamp(15px, 1.6vw, 19px); color: var(--muted); max-width: 520px; line-height: 1.75; margin-bottom: 48px; font-weight: 300; opacity: 0; transform: translateY(20px); animation: fadeUp 0.9s 0.6s forwards; }
+  .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; opacity: 0; transform: translateY(20px); animation: fadeUp 0.9s 0.8s forwards; }
+  .btn-primary { background: var(--accent); color: #fff; text-decoration: none; padding: 15px 30px; border-radius: 10px; font-size: 15px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 24px rgba(37,99,235,0.28); transition: all 0.3s; }
+  .btn-primary:hover { background: #1d4ed8; transform: translateY(-2px); box-shadow: 0 8px 36px rgba(37,99,235,0.35); }
+  .btn-ghost { color: var(--text); text-decoration: none; padding: 15px 30px; border-radius: 10px; font-size: 15px; font-weight: 400; border: 1px solid var(--border2); background: #fff; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+  .hero-stats { position: absolute; bottom: 60px; right: 52px; z-index: 1; display: flex; gap: 36px; opacity: 0; animation: fadeUp 1s 1s forwards; }
+  .hero-stat { text-align: right; }
+  .hero-stat-num { font-family: 'Unbounded', sans-serif; font-size: 26px; font-weight: 700; color: var(--text); display: block; }
+  .hero-stat-label { font-size: 11px; color: var(--muted); letter-spacing: 0.05em; }
+  @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+  /* SECTIONS */
+  section { padding: 100px 52px; }
+  .section-label { font-family: 'Unbounded', sans-serif; font-size: 11px; font-weight: 400; letter-spacing: 0.18em; color: var(--accent); text-transform: uppercase; margin-bottom: 18px; display: flex; align-items: center; gap: 12px; }
+  .section-label::before { content: ''; display: block; width: 28px; height: 1.5px; background: var(--accent); }
+  .section-title { font-family: 'Unbounded', sans-serif; font-size: clamp(24px, 3vw, 46px); font-weight: 700; line-height: 1.13; letter-spacing: -0.02em; color: var(--text); margin-bottom: 14px; }
+  .section-desc { font-size: 17px; color: var(--muted); line-height: 1.75; max-width: 560px; font-weight: 300; margin-bottom: 56px; }
+  .reveal { opacity: 0; transform: translateY(36px); transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+  .section-divider { height: 1px; background: var(--border); margin: 0 52px; }
+
+  /* CONTEXTO */
+  #contexto { background: var(--bg); }
+  .stats-mega-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; background: var(--border); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; }
+  .stat-mega-card { background: #fff; padding: 40px 24px; text-align: center; transition: background 0.3s; }
+  .stat-mega-card:hover { background: #f0f4ff; }
+  .stat-mega-num { font-family: 'Unbounded', sans-serif; font-size: clamp(24px, 2.6vw, 38px); font-weight: 700; color: var(--accent); display: block; margin-bottom: 10px; line-height: 1; }
+  .stat-mega-label { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .stat-mega-badge { display: inline-block; margin-top: 12px; background: rgba(37,99,235,0.08); border: 1px solid rgba(37,99,235,0.18); border-radius: 100px; padding: 3px 12px; font-size: 11px; color: var(--accent); }
+
+  /* BRASIL */
+  #brasil { background: var(--bg2); }
+  .platforms-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .platform-card { background: var(--bg); border: 1px solid var(--border); border-radius: 18px; padding: 32px; display: flex; align-items: center; gap: 24px; transition: all 0.35s; }
+  .platform-card:hover { border-color: rgba(37,99,235,0.3); transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,0.08); }
+  .platform-rank { font-family: 'Unbounded', sans-serif; font-size: 44px; font-weight: 900; color: rgba(0,0,0,0.05); line-height: 1; min-width: 56px; }
+  .platform-icon-wrap { width: 48px; height: 48px; border-radius: 12px; background: rgba(37,99,235,0.08); border: 1px solid rgba(37,99,235,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .platform-info h3 { font-family: 'Unbounded', sans-serif; font-size: 17px; font-weight: 600; margin-bottom: 5px; }
+  .platform-info p { font-size: 13px; color: var(--muted); }
+
+  /* PRODUTOS */
+  #produtos { background: var(--bg); }
+  .produtos-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  .produto-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 28px 16px; text-align: center; transition: all 0.3s; cursor: default; }
+  .produto-card:hover { border-color: rgba(37,99,235,0.3); transform: translateY(-5px); box-shadow: 0 12px 32px rgba(0,0,0,0.08); }
+  .produto-icon-wrap { width: 48px; height: 48px; border-radius: 12px; background: rgba(37,99,235,0.07); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+  .produto-name { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+
+  /* CONTROLE */
+  #controle { background: var(--bg2); }
+  .controle-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; }
+  .controle-main { background: linear-gradient(135deg, rgba(37,99,235,0.05), rgba(124,58,237,0.03)); border: 1px solid rgba(37,99,235,0.15); border-radius: 22px; padding: 48px; text-align: center; }
+  .controle-main-icon { width: 72px; height: 72px; border-radius: 18px; background: rgba(37,99,235,0.09); border: 1px solid rgba(37,99,235,0.2); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; }
+  .controle-main h3 { font-family: 'Unbounded', sans-serif; font-size: 19px; font-weight: 700; margin-bottom: 12px; line-height: 1.35; }
+  .controle-main p { font-size: 14px; color: var(--muted); line-height: 1.8; }
+  .controle-main-badge { display: inline-block; margin-top: 24px; padding: 8px 20px; background: rgba(37,99,235,0.08); border: 1px solid rgba(37,99,235,0.22); border-radius: 100px; font-size: 12px; color: var(--accent); }
+  .controle-features { display: flex; flex-direction: column; gap: 14px; }
+  .controle-feat { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 22px; display: flex; gap: 16px; align-items: flex-start; transition: all 0.3s; }
+  .controle-feat:hover { border-color: rgba(37,99,235,0.25); box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+  .controle-feat-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(37,99,235,0.08); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .controle-feat h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .controle-feat p { font-size: 13px; color: var(--muted); line-height: 1.65; }
+
+  /* PROGRAMA */
+  #programa { background: var(--bg); }
+  .programa-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .programa-card { background: #fff; border: 1px solid var(--border); border-radius: 18px; padding: 36px; position: relative; overflow: hidden; transition: all 0.35s; }
+  .programa-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(0,0,0,0.08); border-color: rgba(37,99,235,0.25); }
+  .programa-card-num { font-family: 'Unbounded', sans-serif; font-size: 60px; font-weight: 900; color: rgba(0,0,0,0.04); line-height: 1; position: absolute; top: 16px; right: 20px; }
+  .programa-icon-wrap { width: 52px; height: 52px; border-radius: 14px; background: rgba(37,99,235,0.08); border: 1px solid rgba(37,99,235,0.15); display: flex; align-items: center; justify-content: center; margin-bottom: 22px; }
+  .programa-card h3 { font-family: 'Unbounded', sans-serif; font-size: 15px; font-weight: 600; margin-bottom: 10px; line-height: 1.4; }
+  .programa-card p { font-size: 14px; color: var(--muted); line-height: 1.75; }
+
+  /* TRIBUTAÇÃO */
+  #tributacao { background: var(--bg2); }
+  .trib-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .trib-card { background: #fff; border-radius: 22px; padding: 36px; border: 1px solid var(--border); position: relative; overflow: hidden; transition: all 0.35s; }
+  .trib-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.08); }
+  .trib-card.featured { border-color: rgba(37,99,235,0.25); background: linear-gradient(160deg, #f0f4ff, #fff); }
+  .trib-range { font-family: 'Unbounded', sans-serif; font-size: 11px; font-weight: 400; color: var(--accent); letter-spacing: 0.06em; margin-bottom: 8px; }
+  .trib-title { font-family: 'Unbounded', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 28px; line-height: 1.3; }
+  .trib-items { display: flex; flex-direction: column; gap: 14px; }
+  .trib-item { display: flex; justify-content: space-between; align-items: center; }
+  .trib-item-label { font-size: 13px; color: var(--muted); }
+  .trib-item-val { font-family: 'Unbounded', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); }
+  .trib-bar { height: 4px; background: rgba(0,0,0,0.07); border-radius: 2px; margin: 6px 0 0; overflow: hidden; }
+  .trib-bar-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+  .trib-note { font-size: 12px; color: var(--muted); margin-top: 22px; padding-top: 22px; border-top: 1px solid var(--border); }
+  .trib-badge { display: inline-block; padding: 4px 14px; border-radius: 100px; font-size: 11px; margin-top: 18px; }
+  .trib-badge.green { background: rgba(5,150,105,0.08); color: var(--accent3); border: 1px solid rgba(5,150,105,0.2); }
+  .trib-badge.yellow { background: rgba(217,119,6,0.08); color: #d97706; border: 1px solid rgba(217,119,6,0.2); }
+  .trib-badge.red { background: rgba(220,38,38,0.07); color: #dc2626; border: 1px solid rgba(220,38,38,0.18); }
+
+  /* CHART */
+  .chart-container { background: #fff; border: 1px solid var(--border); border-radius: 18px; padding: 40px; margin-top: 32px; }
+  .chart-title { font-family: 'Unbounded', sans-serif; font-size: 16px; font-weight: 600; margin-bottom: 32px; }
+  .chart-bars { display: flex; align-items: flex-end; gap: 20px; height: 190px; }
+  .chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; justify-content: flex-end; }
+  .chart-bar { width: 100%; border-radius: 6px 6px 0 0; transition: height 1.3s cubic-bezier(0.16,1,0.3,1); }
+  .chart-bar-label { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; }
+
+  /* VANTAGENS */
+  #vantagens { background: var(--bg); }
+  .vant-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .vant-card { background: #fff; border: 1px solid var(--border); border-radius: 18px; padding: 32px; display: grid; grid-template-columns: 52px 1fr; gap: 20px; transition: all 0.35s; }
+  .vant-card:hover { border-color: rgba(37,99,235,0.25); transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.07); }
+  .vant-icon { width: 52px; height: 52px; border-radius: 13px; background: rgba(37,99,235,0.08); border: 1px solid rgba(37,99,235,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .vant-card h3 { font-family: 'Unbounded', sans-serif; font-size: 15px; font-weight: 600; margin-bottom: 8px; line-height: 1.4; }
+  .vant-card p { font-size: 14px; color: var(--muted); line-height: 1.75; }
+  .vant-law { background: linear-gradient(135deg, rgba(37,99,235,0.05), rgba(124,58,237,0.03)); border: 1px solid rgba(37,99,235,0.18); border-radius: 18px; padding: 36px; grid-column: 1 / -1; display: flex; align-items: center; gap: 28px; }
+  .vant-law-badge { font-family: 'Unbounded', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.09em; color: var(--accent); background: rgba(37,99,235,0.08); border: 1px solid rgba(37,99,235,0.22); border-radius: 8px; padding: 12px 18px; white-space: nowrap; }
+  .vant-law-text h3 { font-family: 'Unbounded', sans-serif; font-size: 17px; font-weight: 600; margin-bottom: 8px; }
+  .vant-law-text p { font-size: 14px; color: var(--muted); line-height: 1.75; }
+
+  /* FEEDBACK */
+  #feedback { background: var(--bg2); text-align: center; }
+  .feedback-inner { max-width: 580px; margin: 0 auto; }
+  .feedback-inner .section-label { justify-content: center; }
+  .feedback-inner .section-label::before { display: none; }
+  .btn-feedback { display: inline-flex; align-items: center; gap: 10px; background: var(--accent); color: #fff; text-decoration: none; padding: 18px 38px; border-radius: 12px; font-size: 16px; font-weight: 500; box-shadow: 0 4px 28px rgba(37,99,235,0.3); transition: all 0.3s; margin-top: 8px; }
+  .btn-feedback:hover { background: #1d4ed8; transform: translateY(-2px); box-shadow: 0 8px 40px rgba(37,99,235,0.38); }
+
+  /* CTA FINAL */
+  #cta-final { background: var(--bg); padding: 120px 52px; text-align: center; position: relative; overflow: hidden; }
+  .cta-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 55% 65% at 50% 50%, rgba(37,99,235,0.05) 0%, transparent 70%); }
+  .cta-inner { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; }
+  .cta-title { font-family: 'Unbounded', sans-serif; font-size: clamp(28px, 4vw, 58px); font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 22px; }
+  .cta-sub { font-size: 17px; color: var(--muted); margin-bottom: 48px; font-weight: 300; line-height: 1.75; }
+  .thanks-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 56px; }
+  .thanks-pill { padding: 8px 18px; border-radius: 100px; border: 1px solid var(--border2); background: #fff; font-size: 13px; color: var(--muted); transition: all 0.25s; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+  .thanks-pill:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* FOOTER */
+  footer { border-top: 1px solid var(--border); padding: 44px 52px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
+  .footer-logo { font-family: 'Unbounded', sans-serif; font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: 0.1em; }
+  .footer-credit { font-size: 12px; color: var(--muted); }
+  .footer-socials { display: flex; gap: 12px; }
+  .footer-social { width: 36px; height: 36px; border-radius: 8px; background: #fff; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--muted); text-decoration: none; transition: all 0.25s; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+  .footer-social:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
+
+  @media (max-width: 1024px) {
+    .stats-mega-grid { grid-template-columns: repeat(2, 1fr); }
+    .platforms-grid { grid-template-columns: 1fr; }
+    .produtos-grid { grid-template-columns: repeat(3, 1fr); }
+    .controle-layout { grid-template-columns: 1fr; }
+    .trib-grid { grid-template-columns: 1fr; }
+    .vant-grid { grid-template-columns: 1fr; }
+    .vant-law { flex-direction: column; gap: 16px; }
+    .hero-stats { display: none; }
+    section { padding: 72px 24px; }
+    nav { padding: 16px 24px; }
+    .section-divider { margin: 0 24px; }
+    .nav-links, .nav-cta { display: none; }
+    .nav-burger { display: flex; }
+    footer { padding: 36px 24px; }
+  }
+  @media (max-width: 640px) {
+    .stats-mega-grid { grid-template-columns: 1fr; }
+    .produtos-grid { grid-template-columns: repeat(2, 1fr); }
+    .programa-cards { grid-template-columns: 1fr; }
+    footer { flex-direction: column; text-align: center; align-items: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SVG DEFS -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-arrow" viewBox="0 0 20 20" fill="none"><path d="M4 10h12M11 6l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-msg" viewBox="0 0 20 20" fill="none"><path d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H7l-4 3V5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="i-bldg" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 8h2M11 8h2M7 12h2M11 12h2M8 16v-3h4v3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-search" viewBox="0 0 20 20" fill="none"><circle cx="8.5" cy="8.5" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M15 15l-3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-dollar" viewBox="0 0 20 20" fill="none"><path d="M10 3v14M7 6.5C7 5.12 8.34 4 10 4s3 1.12 3 2.5S11.66 9 10 9 7 10.12 7 11.5 8.34 14 10 14s3-1.12 3-2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-check" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M7 10.5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 20 20" fill="none"><path d="M10 2.5L3.5 5v5c0 3.67 2.77 7.1 6.5 8 3.73-.9 6.5-4.33 6.5-8V5L10 2.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="i-phones" viewBox="0 0 20 20" fill="none"><path d="M4 12v-2a6 6 0 0112 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><rect x="3" y="12" width="3" height="5" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="14" y="12" width="3" height="5" rx="1.5" stroke="currentColor" stroke-width="1.5"/></symbol>
+  <symbol id="i-watch" viewBox="0 0 20 20" fill="none"><rect x="6" y="5" width="8" height="10" rx="4" stroke="currentColor" stroke-width="1.5"/><path d="M8 5V3.5M12 5V3.5M8 15v1.5M12 15v1.5M10 9v1.5l1 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 20 20" fill="none"><rect x="6" y="2" width="8" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="15.5" r="0.75" fill="currentColor"/></symbol>
+  <symbol id="i-battery" viewBox="0 0 20 20" fill="none"><rect x="2" y="6" width="14" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M16 9v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M5 10h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-tv" viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="16" height="11" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 17h6M10 15v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-speaker" viewBox="0 0 20 20" fill="none"><rect x="5" y="3" width="10" height="14" rx="3" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="12" r="2" stroke="currentColor" stroke-width="1.3"/><circle cx="10" cy="6" r="1" fill="currentColor"/></symbol>
+  <symbol id="i-plug" viewBox="0 0 20 20" fill="none"><path d="M10 14v4M8 6V3M12 6V3M7 6h6v4a3 3 0 01-6 0V6z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-sparkle" viewBox="0 0 20 20" fill="none"><path d="M10 2v3M10 15v3M2 10h3M15 10h3M4.22 4.22l2.12 2.12M13.66 13.66l2.12 2.12M4.22 15.78l2.12-2.12M13.66 6.34l2.12-2.12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-gamepad" viewBox="0 0 20 20" fill="none"><rect x="2" y="6" width="16" height="9" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M7 10H5M6 9v2M13 10h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-home" viewBox="0 0 20 20" fill="none"><path d="M3 9.5L10 3l7 6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 8v8h4v-4h2v4h4V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-shop" viewBox="0 0 20 20" fill="none"><path d="M3 4h14l-1.5 6H4.5L3 4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M4.5 10l1 6h9l1-6" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="8" cy="17.5" r="1" fill="currentColor"/><circle cx="12" cy="17.5" r="1" fill="currentColor"/></symbol>
+  <symbol id="i-pkg" viewBox="0 0 20 20" fill="none"><path d="M17 7l-7-4-7 4v6l7 4 7-4V7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 3v14M3 7l7 4 7-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 20 20" fill="none"><path d="M3 3h6l8 8-6 6-8-8V3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="7" cy="7" r="1.2" fill="currentColor"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 20 20" fill="none"><path d="M12 2L6 11h5l-1 7 7-10h-5l1-6z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 20 20" fill="none"><rect x="4" y="9" width="12" height="9" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 9V7a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="13.5" r="1.2" fill="currentColor"/></symbol>
+  <symbol id="i-clip" viewBox="0 0 20 20" fill="none"><rect x="4" y="4" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M8 4V3a1 1 0 012 0v1M7 9h6M7 12h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-scale" viewBox="0 0 20 20" fill="none"><path d="M10 3v14M5 17h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M3 8l2 5h-4L3 8zM17 8l2 5h-4l2-5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M3 8h14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-up" viewBox="0 0 20 20" fill="none"><path d="M10 15V5M5 10l5-5 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 20 20" fill="none"><path d="M3 15l4-5 4 3 4-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 17h14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+</svg>
+
+<!-- CURSOR -->
+<div id="cursor"><div id="cursor-dot"></div><div id="cursor-ring"></div></div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <div class="nav-logo">DIREITO MARÍTIMO</div>
+  <ul class="nav-links">
+    <li><a href="#contexto">Contexto</a></li>
+    <li><a href="#brasil">Brasil</a></li>
+    <li><a href="#tributacao">Tributação</a></li>
+    <li><a href="#programa">Programa RC</a></li>
+    <li><a href="#vantagens">Vantagens</a></li>
+  </ul>
+  <a href="#feedback" class="nav-cta">Dar Feedback</a>
+  <div class="nav-burger" id="burger"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#contexto" onclick="closeMobile()">Contexto</a>
+  <a href="#brasil" onclick="closeMobile()">Brasil</a>
+  <a href="#tributacao" onclick="closeMobile()">Tributação</a>
+  <a href="#programa" onclick="closeMobile()">Programa RC</a>
+  <a href="#vantagens" onclick="closeMobile()">Vantagens</a>
+  <a href="#feedback" onclick="closeMobile()">Feedback</a>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-orbs"><div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div></div>
+  <div class="hero-inner">
+    <div class="hero-badge"><span class="hero-badge-dot"></span>Curso de Direito · UniSantos</div>
+    <h1 class="hero-title">O Tratamento Aduaneiro do<br><span class="grad">E-Commerce Internacional</span></h1>
+    <p class="hero-sub">Uma análise profunda sobre como o Brasil regula, tributa e fiscaliza as compras internacionais online — do contexto global à sua encomenda.</p>
+    <div class="hero-actions">
+      <a href="#contexto" class="btn-primary">Explorar Conteúdo<svg width="18" height="18"><use href="#i-arrow"/></svg></a>
+      <a href="#feedback" class="btn-ghost">Dar Feedback<svg width="18" height="18"><use href="#i-msg"/></svg></a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat"><span class="hero-stat-num">US$6,4T</span><span class="hero-stat-label">Mercado em 2029</span></div>
+    <div class="hero-stat"><span class="hero-stat-num">9,49%</span><span class="hero-stat-label">CAGR Anual</span></div>
+    <div class="hero-stat"><span class="hero-stat-num">3,6Bi</span><span class="hero-stat-label">Usuários online</span></div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- CONTEXTO -->
+<section id="contexto">
+  <div class="section-label reveal">Seção 01</div>
+  <h2 class="section-title reveal reveal-delay-1">Contexto Global do E-Commerce</h2>
+  <p class="section-desc reveal reveal-delay-2">O comércio eletrônico internacional cresce em ritmo acelerado, transformando hábitos de consumo e desafiando sistemas aduaneiros ao redor do mundo.</p>
+  <div class="stats-mega-grid reveal reveal-delay-2">
+    <div class="stat-mega-card"><span class="stat-mega-num">US$4,1T</span><div class="stat-mega-label">Volume global do mercado de e-commerce</div><div class="stat-mega-badge">2024</div></div>
+    <div class="stat-mega-card"><span class="stat-mega-num">US$6,4T</span><div class="stat-mega-label">Projeção do mercado global</div><div class="stat-mega-badge">2029</div></div>
+    <div class="stat-mega-card"><span class="stat-mega-num">9,49%</span><div class="stat-mega-label">Taxa de crescimento anual composta (CAGR)</div><div class="stat-mega-badge">2024–2029</div></div>
+    <div class="stat-mega-card"><span class="stat-mega-num">3,6Bi</span><div class="stat-mega-label">Consumidores online esperados</div><div class="stat-mega-badge">até 2029</div></div>
+  </div>
+  <div style="margin-top:2px" class="stats-mega-grid reveal reveal-delay-3">
+    <div class="stat-mega-card"><span class="stat-mega-num">40,5%</span><div class="stat-mega-label">Penetração de usuários no e-commerce mundial</div><div class="stat-mega-badge">2024</div></div>
+    <div class="stat-mega-card" style="grid-column:span 3"><span class="stat-mega-num">49,1%</span><div class="stat-mega-label">Projeção de penetração de usuários no e-commerce mundial — crescimento significativo em 5 anos</div><div class="stat-mega-badge">2029</div></div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- BRASIL -->
+<section id="brasil">
+  <div class="section-label reveal">Seção 02</div>
+  <h2 class="section-title reveal reveal-delay-1">Maiores Exportadoras para o Brasil</h2>
+  <p class="section-desc reveal reveal-delay-2">Em 2025, estas são as plataformas que mais entregam produtos internacionais no território brasileiro.</p>
+  <div class="platforms-grid">
+    <div class="platform-card reveal reveal-delay-1"><div class="platform-rank">01</div><div class="platform-icon-wrap"><svg width="22" height="22" style="color:var(--accent)"><use href="#i-shop"/></svg></div><div class="platform-info"><h3>Mercado Livre</h3><p>Líder latino-americano com forte presença cross-border e logística integrada</p></div></div>
+    <div class="platform-card reveal reveal-delay-2"><div class="platform-rank">02</div><div class="platform-icon-wrap"><svg width="22" height="22" style="color:var(--accent)"><use href="#i-tag"/></svg></div><div class="platform-info"><h3>Shopee</h3><p>Plataforma asiática com crescimento acelerado no mercado brasileiro</p></div></div>
+    <div class="platform-card reveal reveal-delay-3"><div class="platform-rank">03</div><div class="platform-icon-wrap"><svg width="22" height="22" style="color:var(--accent)"><use href="#i-pkg"/></svg></div><div class="platform-info"><h3>Amazon</h3><p>Gigante global com ampla variedade de produtos importados e logística premium</p></div></div>
+    <div class="platform-card reveal reveal-delay-4"><div class="platform-rank">04</div><div class="platform-icon-wrap"><svg width="22" height="22" style="color:var(--accent)"><use href="#i-sparkle"/></svg></div><div class="platform-info"><h3>SHEIN</h3><p>Fenômeno de moda rápida com enorme volume de remessas internacionais ao Brasil</p></div></div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- PRODUTOS -->
+<section id="produtos">
+  <div class="section-label reveal">Seção 03</div>
+  <h2 class="section-title reveal reveal-delay-1">Produtos Mais Importados</h2>
+  <p class="section-desc reveal reveal-delay-2">Os itens que os brasileiros mais compram do exterior via e-commerce — dominados por tecnologia e eletrônicos.</p>
+  <div class="produtos-grid">
+    <div class="produto-card reveal reveal-delay-1"><div class="produto-icon-wrap"><svg width="22" height="22" style="color:var(--accent)"><use href="#i-phones"/></svg></div><div class="produto-name">Fones Bluetooth</div></div>
+    <div class="produto-card reveal reveal-delay-1"><div class="produto-icon-wrap"><svg width="22" height="22" style="color:var(--accent)"><use href="#i-watch"/></svg></div><div class="produto-name">Smartwatches</div></div>
+    <div class="produto-card reveal reveal-delay-2"><div class="produto-icon-wrap"><svg width="22" height="22" style="color:var(--accent)"><use href="#i-phone"/></svg></div><div class="produto-name">Smartphones intermediários</div></div>
+    <div class="produto-card reveal reveal-delay-2"><div class="produto-icon-wrap"><svg width="22" height="22" style="color:var(--accent)"><use href="#i-battery"/></svg></div><div class="produto-name">Power Banks</div></div>
+    <div class="produto-card reveal reveal-delay-3"><div class="produto-icon-wrap"><svg width="22" height="22" style="color:var(--accent)"><use href="#i-tv"/></svg></div><div class="produto-name">TV Stick / Streaming</div></div>
+    <div class="produto-card reveal reveal-delay-3"><div class="produto-icon-wrap"><svg width="22" height="22" style="color:var(--accent)"><use href="#i-speaker"/></svg></div><div class="produto-name">Caixas de Som BT</div></div>
+    <div class="produto-card reveal reveal-delay-4"><div class="produto-icon-wrap"><svg width="22" height="22" style="color:var(--accent)"><use href="#i-plug"/></svg></div><div class="produto-name">Adaptadores USB-C</div></div>
+    <div class="produto-card reveal reveal-delay-4"><div class="produto-icon-wrap"><svg width="22" height="22" style="color:var(--accent)"><use href="#i-sparkle"/></svg></div><div class="produto-name">Beleza Tecnológica</div></div>
+    <div class="produto-card reveal reveal-delay-1"><div class="produto-icon-wrap"><svg width="22" height="22" style="color:var(--accent)"><use href="#i-gamepad"/></svg></div><div class="produto-name">Acessórios Gamer</div></div>
+    <div class="produto-card reveal reveal-delay-2"><div class="produto-icon-wrap"><svg width="22" height="22" style="color:var(--accent)"><use href="#i-home"/></svg></div><div class="produto-name">Casa Inteligente</div></div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- CONTROLE -->
+<section id="controle">
+  <div class="section-label reveal">Seção 04</div>
+  <h2 class="section-title reveal reveal-delay-1">Controle Aduaneiro</h2>
+  <p class="section-desc reveal reveal-delay-2">Quem são os responsáveis pela fiscalização das importações no Brasil e como funciona esse sistema?</p>
+  <div class="controle-layout">
+    <div class="controle-main reveal reveal-delay-1">
+      <div class="controle-main-icon"><svg width="32" height="32" style="color:var(--accent)"><use href="#i-bldg"/></svg></div>
+      <h3>Receita Federal do Brasil — RFB</h3>
+      <p>Vinculada ao Ministério da Fazenda, é o principal órgão responsável pela fiscalização, controle e tributação de todas as importações, incluindo remessas postais e expressas do comércio eletrônico internacional.</p>
+      <div class="controle-main-badge">Órgão Principal de Controle</div>
+    </div>
+    <div class="controle-features">
+      <div class="controle-feat reveal reveal-delay-2"><div class="controle-feat-icon"><svg width="20" height="20" style="color:var(--accent)"><use href="#i-search"/></svg></div><div><h4>Fiscalização e Controle</h4><p>Análise documental e física das remessas internacionais, com verificação de origem, valor e classificação fiscal dos produtos.</p></div></div>
+      <div class="controle-feat reveal reveal-delay-3"><div class="controle-feat-icon"><svg width="20" height="20" style="color:var(--accent)"><use href="#i-dollar"/></svg></div><div><h4>Lançamento Tributário</h4><p>Cálculo e cobrança dos tributos incidentes sobre importações: Imposto de Importação (II) e ICMS em conjunto com os estados.</p></div></div>
+      <div class="controle-feat reveal reveal-delay-4"><div class="controle-feat-icon"><svg width="20" height="20" style="color:var(--accent)"><use href="#i-check"/></svg></div><div><h4>Certificação de Empresas</h4><p>Credenciamento de empresas participantes do Programa Remessa Conforme, garantindo conformidade fiscal prévia.</p></div></div>
+      <div class="controle-feat reveal reveal-delay-4"><div class="controle-feat-icon"><svg width="20" height="20" style="color:var(--accent)"><use href="#i-shield"/></svg></div><div><h4>Combate à Subfaturação</h4><p>Prevenção à declaração de valores inferiores ao real, que prejudica a arrecadação e distorce a concorrência com o varejo nacional.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- PROGRAMA -->
+<section id="programa">
+  <div class="section-label reveal">Seção 05</div>
+  <h2 class="section-title reveal reveal-delay-1">Programa Remessa Conforme</h2>
+  <p class="section-desc reveal reveal-delay-2">Iniciativa da Receita Federal que certifica lojas online que seguem regras especiais de importação, garantindo agilidade e transparência.</p>
+  <div class="programa-cards">
+    <div class="programa-card reveal reveal-delay-1"><div class="programa-card-num">01</div><div class="programa-icon-wrap"><svg width="24" height="24" style="color:var(--accent)"><use href="#i-dollar"/></svg></div><h3>Impostos na Hora da Compra</h3><p>Os tributos já são calculados e pagos no momento da compra, sem surpresas na chegada da encomenda.</p></div>
+    <div class="programa-card reveal reveal-delay-2"><div class="programa-card-num">02</div><div class="programa-icon-wrap"><svg width="24" height="24" style="color:var(--accent)"><use href="#i-chart"/></svg></div><h3>Informações Antecipadas</h3><p>Os dados chegam à Receita Federal antes da mercadoria, permitindo análise prévia e despacho mais ágil.</p></div>
+    <div class="programa-card reveal reveal-delay-3"><div class="programa-card-num">03</div><div class="programa-icon-wrap"><svg width="24" height="24" style="color:var(--accent)"><use href="#i-bolt"/></svg></div><h3>Entrega Mais Rápida</h3><p>A encomenda passa menos tempo na alfândega. Você recebe seu pedido mais rápido e sem cobranças inesperadas.</p></div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- TRIBUTAÇÃO -->
+<section id="tributacao">
+  <div class="section-label reveal">Seção 06</div>
+  <h2 class="section-title reveal reveal-delay-1">Tributação do E-Commerce</h2>
+  <p class="section-desc reveal reveal-delay-2">Como ficam os impostos nas compras internacionais dentro e fora do Programa Remessa Conforme?</p>
+  <div class="trib-grid">
+    <div class="trib-card featured reveal reveal-delay-1">
+      <div class="trib-range">Faixa Reduzida</div><div class="trib-title">Até US$ 50</div>
+      <div class="trib-items">
+        <div class="trib-item"><span class="trib-item-label">Imposto de Importação</span><span class="trib-item-val">20%</span></div>
+        <div class="trib-bar"><div class="trib-bar-fill" style="width:20%"></div></div>
+        <div class="trib-item"><span class="trib-item-label">ICMS (*SP)</span><span class="trib-item-val">17%</span></div>
+        <div class="trib-bar"><div class="trib-bar-fill" style="width:17%;background:linear-gradient(90deg,var(--accent2),var(--accent3))"></div></div>
+      </div>
+      <div class="trib-note">Fim da isenção anterior — nova regra vigente</div>
+      <span class="trib-badge green">Remessa Conforme</span>
+    </div>
+    <div class="trib-card reveal reveal-delay-2">
+      <div class="trib-range">Faixa Principal</div><div class="trib-title">US$50,01 — US$3.000</div>
+      <div class="trib-items">
+        <div class="trib-item"><span class="trib-item-label">Imposto de Importação</span><span class="trib-item-val">60%</span></div>
+        <div class="trib-bar"><div class="trib-bar-fill" style="width:60%"></div></div>
+        <div class="trib-item"><span class="trib-item-label">ICMS (*SP)</span><span class="trib-item-val">17%</span></div>
+        <div class="trib-bar"><div class="trib-bar-fill" style="width:17%;background:linear-gradient(90deg,var(--accent2),var(--accent3))"></div></div>
+      </div>
+      <div class="trib-note">Desconto de US$20 na base de cálculo</div>
+      <span class="trib-badge yellow">Remessa Conforme</span>
+    </div>
+    <div class="trib-card reveal reveal-delay-3">
+      <div class="trib-range">Não Aderentes</div><div class="trib-title">Empresas fora do programa</div>
+      <div class="trib-items">
+        <div class="trib-item"><span class="trib-item-label">Imposto de Importação</span><span class="trib-item-val">60%</span></div>
+        <div class="trib-bar"><div class="trib-bar-fill" style="width:60%;background:linear-gradient(90deg,#dc2626,#991b1b)"></div></div>
+        <div class="trib-item"><span class="trib-item-label">ICMS (*SP)</span><span class="trib-item-val">17%</span></div>
+        <div class="trib-bar"><div class="trib-bar-fill" style="width:17%;background:linear-gradient(90deg,#dc2626,#991b1b)"></div></div>
+      </div>
+      <div class="trib-note">Cobrança na chegada · Maior risco de retenção</div>
+      <span class="trib-badge red">Sem Certificação</span>
+    </div>
+  </div>
+  <div class="chart-container reveal">
+    <div class="chart-title">Comparativo de Alíquotas — Imposto de Importação</div>
+    <div class="chart-bars">
+      <div class="chart-bar-wrap"><div class="chart-bar" id="bar1" style="height:0;background:linear-gradient(180deg,#2563eb,#7c3aed)"></div><div class="chart-bar-label">Até US$50<br><small>(RC)</small></div></div>
+      <div class="chart-bar-wrap"><div class="chart-bar" id="bar2" style="height:0;background:linear-gradient(180deg,#d97706,#dc2626)"></div><div class="chart-bar-label">US$50–3K<br><small>(RC)</small></div></div>
+      <div class="chart-bar-wrap"><div class="chart-bar" id="bar3" style="height:0;background:linear-gradient(180deg,#dc2626,#7f1d1d)"></div><div class="chart-bar-label">Não<br>aderentes</div></div>
+      <div class="chart-bar-wrap"><div class="chart-bar" id="bar4" style="height:0;background:linear-gradient(180deg,#059669,#065f46)"></div><div class="chart-bar-label">ICMS SP</div></div>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-top:20px;text-align:center">*Valores sujeitos à legislação vigente. ICMS varia por estado.</div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- VANTAGENS -->
+<section id="vantagens">
+  <div class="section-label reveal">Seção 07</div>
+  <h2 class="section-title reveal reveal-delay-1">Vantagens do Programa</h2>
+  <p class="section-desc reveal reveal-delay-2">A nova sistemática tributária traz benefícios concretos para consumidores, empresas e para o Estado brasileiro.</p>
+  <div class="vant-grid">
+    <div class="vant-law reveal"><div class="vant-law-badge">LEI Nº 14.902/2024</div><div class="vant-law-text"><h3>Nova Sistemática Tributária</h3><p>Extinção da isenção para remessas de até US$50. Nova tributação de 20% até esse valor e 60% acima. ICMS de 17% em SP. Maior previsibilidade e conformidade fiscal para todos os envolvidos.</p></div></div>
+    <div class="vant-card reveal reveal-delay-1"><div class="vant-icon"><svg width="24" height="24" style="color:var(--accent)"><use href="#i-bolt"/></svg></div><div><h3>Celeridade no Despacho Aduaneiro</h3><p>A análise antecipada pela Receita Federal reduz drasticamente o tempo de retenção nas alfândegas, acelerando a entrega dos produtos.</p></div></div>
+    <div class="vant-card reveal reveal-delay-2"><div class="vant-icon"><svg width="24" height="24" style="color:var(--accent)"><use href="#i-lock"/></svg></div><div><h3>Previsibilidade e Segurança Jurídica</h3><p>Tributos informados no momento da compra trazem mais transparência ao processo e reduzem conflitos entre consumidores e plataformas.</p></div></div>
+    <div class="vant-card reveal reveal-delay-3"><div class="vant-icon"><svg width="24" height="24" style="color:var(--accent)"><use href="#i-clip"/></svg></div><div><h3>Compliance e Conformidade</h3><p>Exigência de regularidade fiscal das empresas participantes. Resultado: despacho mais ágil, maior eficiência logística e mercado mais justo.</p></div></div>
+    <div class="vant-card reveal reveal-delay-4"><div class="vant-icon"><svg width="24" height="24" style="color:var(--accent)"><use href="#i-scale"/></svg></div><div><h3>Concorrência Leal</h3><p>O programa combate a subfaturação e protege o varejo nacional, garantindo regras mais equitativas entre plataformas estrangeiras e empresas brasileiras.</p></div></div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- FEEDBACK -->
+<section id="feedback">
+  <div class="feedback-inner">
+    <div class="section-label reveal">Sua Opinião</div>
+    <h2 class="section-title reveal reveal-delay-1">Nos diga o que achou!</h2>
+    <p class="section-desc reveal reveal-delay-2" style="margin:0 auto 40px;text-align:center">Este trabalho foi útil? As informações foram claras? Queremos saber sua opinião. Leva menos de 1 minuto!</p>
+    <div class="reveal reveal-delay-3">
+      <a href="https://forms.gle/PpY9ypgmWfvJ6Moa6" target="_blank" class="btn-feedback">
+        <svg width="18" height="18"><use href="#i-msg"/></svg>
+        Responder Formulário de Feedback
+        <svg width="16" height="16"><use href="#i-arrow"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- CTA FINAL -->
+<section id="cta-final">
+  <div class="cta-bg"></div>
+  <div class="cta-inner">
+    <h2 class="cta-title reveal">Obrigado por<br><span style="background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">explorar conosco.</span></h2>
+    <p class="cta-sub reveal reveal-delay-1">O comércio eletrônico internacional é uma realidade que impacta milhões de brasileiros. Entender as regras aduaneiras é um direito de todo cidadão.</p>
+    <div class="thanks-row reveal reveal-delay-2">
+      <div class="thanks-pill">Obrigado!</div>
+      <div class="thanks-pill">Thank you!</div>
+      <div class="thanks-pill">Merci!</div>
+      <div class="thanks-pill">ありがとう</div>
+      <div class="thanks-pill">Gracias!</div>
+      <div class="thanks-pill">謝謝</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">DIREITO MARÍTIMO · UNISANTOS</div>
+  <div class="footer-credit">Trabalho do Grupo 10 · Curso de Direito · UniSantos</div>
+  <div class="footer-socials">
+    <a href="https://forms.gle/PpY9ypgmWfvJ6Moa6" target="_blank" class="footer-social" title="Feedback"><svg width="16" height="16"><use href="#i-msg"/></svg></a>
+    <a href="#hero" class="footer-social" title="Topo"><svg width="16" height="16"><use href="#i-up"/></svg></a>
+  </div>
+</footer>
+
+<script>
+  // CURSOR
+  const dot = document.getElementById('cursor-dot'), ring = document.getElementById('cursor-ring');
+  let mx=0, my=0, rx=0, ry=0;
+  document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+  (function tick(){ dot.style.left=mx+'px'; dot.style.top=my+'px'; rx+=(mx-rx)*0.13; ry+=(my-ry)*0.13; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(tick); })();
+  document.querySelectorAll('a,button,.produto-card,.platform-card,.vant-card').forEach(el => {
+    el.addEventListener('mouseenter', ()=>{ ring.style.width='50px'; ring.style.height='50px'; ring.style.borderColor='rgba(37,99,235,0.65)'; });
+    el.addEventListener('mouseleave', ()=>{ ring.style.width='34px'; ring.style.height='34px'; ring.style.borderColor='rgba(37,99,235,0.45)'; });
+  });
+
+  // MOBILE MENU
+  document.getElementById('burger').addEventListener('click', ()=> document.getElementById('mobileMenu').classList.toggle('open'));
+  function closeMobile(){ document.getElementById('mobileMenu').classList.remove('open'); }
+
+  // SCROLL REVEAL
+  const obs = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }), {threshold:0.1, rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+  // CHART
+  const cObs = new IntersectionObserver(es => es.forEach(e => {
+    if(e.isIntersecting){
+      setTimeout(()=>{
+        document.getElementById('bar1').style.height='63px';
+        document.getElementById('bar2').style.height='152px';
+        document.getElementById('bar3').style.height='152px';
+        document.getElementById('bar4').style.height='54px';
+      },200);
+      cObs.unobserve(e.target);
+    }
+  }), {threshold:0.3});
+  const chartEl = document.querySelector('.chart-container');
+  if(chartEl) cObs.observe(chartEl);
+
+  // NAV SHADOW
+  window.addEventListener('scroll', ()=>{
+    document.getElementById('navbar').style.boxShadow = window.scrollY > 60 ? '0 2px 20px rgba(0,0,0,0.07)' : 'none';
+  });
+
+  // PARALLAX
+  window.addEventListener('scroll', ()=>{
+    const y = window.scrollY;
+    document.querySelector('.orb1').style.transform=`translateY(${y*0.12}px)`;
+    document.querySelector('.orb2').style.transform=`translateY(${-y*0.07}px)`;
+  });
+</script>
+</body>
+</html>
